@@ -78,3 +78,5 @@ SELECT
 FROM turnos t
 JOIN consultorio  c ON c.id = t.consultorio_id
 JOIN instituciones i ON i.id = c.institucion_id;
+
+#
