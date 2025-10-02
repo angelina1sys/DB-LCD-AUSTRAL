@@ -1,17 +1,37 @@
 # Práctica de Funciones y Joins
 
--- 1) Armá una agenda de turnos listando institución y consultorio, fecha-hora del turno, nombre del médico y paciente para el día de hoy
+-- 1) Armá una agenda de turnos listando institución y consultorio, fecha-hora del turno, nombre del médico y 
+-- paciente para el día de hoy
 --  -------------------------------------------------------------------------------------------------------
 -- |Institución	- Consultorio	| fecha-hora del turno dd-mm-YYYY HH:MM	| (matrícula) Médido	| Paciente |
 --  -------------------------------------------------------------------------------------------------------
-
+SELECT CONCAT(I.razon_social, "-", C.consultorio), 
+	CONCAT(date_format(T.fecha, "%d-%m/%Y"), " ", date_format(T.hora, "%H:%m")) "fecha-hora del turno dd-mm-YYYY HH:MM",
+    CONCAT("(", M.matricula, ") ", M.apellido_nombre) "(matrícula) Médido",
+    P.apellido_nombre "Paciente"
+    FROM `gruposanatorio`.`instituciones` I 
+		INNER JOIN `gruposanatorio`.`consultorio` C ON I.id=C.institucion_id
+		INNER JOIN `gruposanatorio`.`turnos` T ON C.id=T.consultorio_id
+        LEFT JOIN `gruposanatorio`.`medicos` M ON T.medico_id=M.id
+        LEFT JOIN `gruposanatorio`.`pacientes` P ON T.paciente_id=P.id
+	WHERE fecha = curdate();
 
 -- 2) Basándote en el ejercicio anterior agregá la edad del paciente a la fecha del turno
 -- Función para calcular la edad: year(curdate()) - year(fec_nac) - (right(curdate(), 5) < right(fec_nac, 5)) 
 --  --------------------------------------------------------------------------------------------------------------
 -- |Institución	- Consultorio	| fecha-hora del turno dd-mm-YYYY HH:MM	| (matrícula) Médido	| Paciente | Edad |
 --  --------------------------------------------------------------------------------------------------------------
-
+SELECT CONCAT(I.razon_social, "-", C.consultorio), 
+	CONCAT(date_format(T.fecha, "%d-%m/%Y"), " ", date_format(T.hora, "%H:%m")) "fecha-hora del turno dd-mm-YYYY HH:MM",
+    CONCAT("(", M.matricula, ") ", M.apellido_nombre) "(matrícula) Médido",
+    P.apellido_nombre "Paciente", P.fecha_nacimiento,
+    year(T.fecha) - year(P.fecha_nacimiento) - (right(T.fecha, 5) < right(P.fecha_nacimiento, 5))  "Edad"
+    FROM `gruposanatorio`.`instituciones` I 
+		INNER JOIN `gruposanatorio`.`consultorio` C ON I.id=C.institucion_id
+		INNER JOIN `gruposanatorio`.`turnos` T ON C.id=T.consultorio_id
+        LEFT JOIN `gruposanatorio`.`medicos` M ON T.medico_id=M.id
+        LEFT JOIN `gruposanatorio`.`pacientes` P ON T.paciente_id=P.id
+	WHERE fecha = curdate();
 
 -- 3) Basándote en el ejercicio anterior agregá la cobertura médica a la fecha del turno, si no tiene cobertura indicar PARTICULAR
 -- Ayudín: COALESCE(os.obra_social, 'PARTICULAR') // CASE para “Vigente/Sin cobertura”
